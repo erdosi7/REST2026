@@ -17,28 +17,37 @@ app.get('/hello', (req, res) => {
     res.send("Hello itt az Express webszerver!");
 })
 
-app.get('/api/courses', (req, res) => {
+app.get('/api.courses', (req, res) => {
     res.json(courses);
 })
 
 //Egyetlen kurzus adatainak lekérése URL paraméter alapján
-app.get('/api/courses/:id', (req, res) => {
+app.get('/api.courses/:id', (req, res) => {
     //Keresés a tömbben
-    const course = courses.find(c =>c.id === parseInt(req.params.id))
+    const course = courses.find(c =>c.id === parseInt(req.params.id));
     //A keresett elem nem található (404)-es státuszkód és hibaüzenet visszaadása
     if (!course) res.status(404).send('A megadott ID-val nem létezik kurzus!');
     res.json(course); //Visszaadjuk a keresett kurzust
 })
 
 //POST végpont létrehozása kurzus adatok küldésére a szervernek
-app.post('api/courses',(req,res) => {
+app.post('/api.courses',(req,res) => {
 //Új kurzus objektum létrehozása (Az ID automatikus növelése)
-    const couse = {
+    const course = {
         id: courses.length +1,
         name: req.body.name
     }
     courses.push(course); //Az új kurzus objektum hozzá adása a courses tömbhöz
-    res.json(req.body); //A kibővitett kurzus adatainak a lekérése
+    res.status(200).json({message: 'Új elem hozzáadva', data: req.body}); //A kurzus objektum hozzáadása a kurzusok tömbhöz
+})
+
+//DELETE végpont a kurzus adatok törlésére
+app.delete('/api.courses/:id', (req,res) => {
+    const course = courses.find(c =>c.id === parseInt(req.params.id));
+     if (!course) res.status(404).send('A megadott ID-val nem létezik kurzus!');
+        const index = courses.indexOf(course);     //A törölni kívánt elem indexének meghatározása a tömbben
+        courses.splice(index,1); //A kurzus elem eltávolítása a tömbből
+        res.json({message: 'Sikeres adat törlés', data: req.body}); //A törlés nyugtázása
 })
 
 
